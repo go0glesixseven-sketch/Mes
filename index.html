@@ -155,14 +155,13 @@
     (async () => {
       const { createClient } = supabase;
 
-      // Проверка конфигурации
       if (
         !window.SUPABASE_CONFIG ||
         window.SUPABASE_CONFIG.url.includes('ВАШ') ||
         window.SUPABASE_CONFIG.anonKey.includes('ВАШ')
       ) {
         alert(
-          '⚠️ Настройте Supabase в файле js/config.js (Project URL и anon key), затем обновите страницу.'
+          '⚠️ Настройте Supabase в файле config.js (Project URL и anon key), затем обновите страницу.'
         );
       }
 
@@ -171,12 +170,9 @@
         window.SUPABASE_CONFIG.anonKey
       );
 
-      // Инициализация модулей
       OrbitaAuth.init(supabase);
       OrbitaChat.init(supabase);
       OrbitaUI.init();
-
-      const currentView = () => OrbitaUI.getCurrentView();
 
       /* ---------- АВТОРИЗАЦИЯ ---------- */
 
@@ -234,18 +230,12 @@
 
       /* ---------- SUPABASE AUTH LISTENER ---------- */
 
-      const { data: authListener } = OrbitaAuth.onAuthStateChange(async (event, session) => {
+      OrbitaAuth.onAuthStateChange(async (event, session) => {
         if (session && session.user) {
-          // Обновляем статус
           await OrbitaAuth.updateStatus('online');
-
-          // Переходим к чатам
           OrbitaUI.navigateTo('chats');
-
-          // Загружаем чаты
           await refreshConversations();
 
-          // Подписка на изменения списка чатов
           OrbitaChat.subscribeToConversations(async () => {
             await refreshConversations();
           });
@@ -282,22 +272,17 @@
           currentConversationId = conv.id;
           OrbitaChat.setCurrentConversation(conv.id);
 
-          // Заголовок чата
           const me = OrbitaAuth.getCurrentUser();
           const myProfile = await OrbitaAuth.getMyProfile();
           OrbitaUI.setChatHeader(conv, myProfile);
 
-          // Загружаем сообщения
           const messages = await OrbitaChat.loadMessages(conv.id);
           OrbitaUI.renderMessages(messages, me.id);
 
-          // Отмечаем прочитанными
           await OrbitaChat.markAsRead(conv.id);
 
-          // Переходим на экран чата
           OrbitaUI.showChatScreen(conv);
 
-          // Подписка на новые сообщения
           OrbitaChat.subscribeToMessages(conv.id, (newMsg) => {
             OrbitaUI.appendMessage(newMsg, me.id);
           });
@@ -319,7 +304,6 @@
             OrbitaUI.showToast('Пользователь не найден');
             return;
           }
-          // Берём первого найденного (в продакшене — выбор из списка)
           const companion = users[0];
           const convId = await OrbitaChat.getOrCreateDirectConversation(companion.id);
           await refreshConversations();
@@ -336,7 +320,6 @@
         }
         try {
           const users = await OrbitaAuth.searchUsers(q);
-          // Рендерим список пользователей как чаты (упрощённо)
           const fakeConvos = users.map((u) => ({
             id: 'user:' + u.id,
             type: 'direct',
@@ -375,7 +358,6 @@
         sendBtn.disabled = !hasText;
         sendBtn.classList.toggle('active', hasText);
 
-        // Авторазмер textarea
         messageInput.style.height = 'auto';
         messageInput.style.height = messageInput.scrollHeight + 'px';
       });
@@ -412,7 +394,6 @@
         }
       }, 30000);
 
-      // При закрытии вкладки — офлайн
       window.addEventListener('beforeunload', async () => {
         if (OrbitaAuth.getCurrentUser()) {
           await OrbitaAuth.updateStatus('offline');

@@ -1,14 +1,10 @@
 // ============================================
-// Конфигурация Supabase для мессенджера Орбита
-// Замените значения ниже на свои из Supabase Dashboard
+// Конфигурация Supabase — Орбита
+// Вставь свои ключи из Supabase Dashboard
 // ============================================
 const SUPABASE_CONFIG = {
-  // Project URL (например: https://xyzcompany.supabase.co)
   url: 'https://rtafobxsajeveobtjkrh.supabase.co',
-
-  // Anon public key (начинается с eyJ...)
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0YWZvYnhzYWpldmVvYnRqa3JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3OTgxMTMsImV4cCI6MjEwOTM3NDExM30.0lHp8l0qXSffwwBmUszio2v8LOzXiE5FjHbqXYZWoRs',
+  anonKey: 'sb_publishable_gyNAm9HenFnKEYCa1Tocbg_byVIQk0w',
 };
 
-// Экспортируем для использования в других файлах
 window.SUPABASE_CONFIG = SUPABASE_CONFIG;
