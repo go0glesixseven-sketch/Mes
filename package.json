@@ -1,0 +1,6 @@
+{
+  "name": "orbita-messenger",
+  "version": "1.0.0",
+  "description": "Орбита — современный мессенджер на HTML + Supabase + Cloudflare Pages",
+  "private": true
+}

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Орбита — современный мессенджер</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ===== Экран авторизации ===== -->
+  <div id="screen-auth" class="screen active">
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="logo">🛰️</div>
+        <h1>Орбита</h1>
+        <p>Мессенджер нового поколения</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabLogin">Вход</button>
+          <button class="auth-tab" id="tabRegister">Регистрация</button>
+        </div>
+
+        <form id="formLogin" class="auth-form">
+          <div class="auth-input-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required />
+          </div>
+          <div class="auth-input-group">
+            <label>Пароль</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="auth-btn">Войти в Орбиту</button>
+        </form>
+
+        <form id="formRegister" class="auth-form" style="display: none;">
+          <div class="auth-input-group">
+            <label>Имя и фамилия</label>
+            <input type="text" id="regName" placeholder="Иван Иванов" required />
+          </div>
+          <div class="auth-input-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" required />
+          </div>
+          <div class="auth-input-group">
+            <label>Пароль</label>
+            <input type="password" id="regPassword" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="auth-btn">Создать аккаунт</button>
+        </form>
+
+        <div class="auth-divider">Или продолжить с</div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="icon-btn" style="background:#4285F4; color: white; border: none;">G</button>
+          <button class="icon-btn" style="background:#3b5998; color: white; border: none;">f</button>
+        </div>
+
+        <p class="auth-switch">
+          Уже есть аккаунт? <span id="linkToLogin" style="cursor: pointer;">Войти</span>
+        </p>
+      </div>
+    </div>
+
+    <button class="icon-btn" id="themeToggle" style="position: fixed; top: 20px; right: 20px; z-index: 100;">🌙</button>
+  </div>
+
+  <!-- ===== Экран чатов ===== -->
+  <div id="screen-chats" class="screen">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">🛰️ Орбита</div>
+        <div class="sidebar-search">
+          <input type="text" id="searchUsers" placeholder="Поиск пользователей…" />
+        </div>
+        <div class="sidebar-actions">
+          <button class="icon-btn" id="profileBtn">👤</button>
+          <button class="icon-btn" id="logoutBtn">🚪</button>
+        </div>
+      </div>
+      <div class="sidebar-body" id="conversationsList"></div>
+      <button class="new-chat-btn" id="newChatBtn" style="position: absolute; bottom: 24px; right: 20px; z-index: 10;">✏️</button>
+    </div>
+
+    <div class="chat-wrapper" id="emptyChatView">
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.4;">💬</div>
+        <div style="font-size: 18px; font-weight: 700; color: var(--text-main);">Выберите чат</div>
+        <div style="font-size: 14px; margin-top: 6px;">Начните разговор из списка слева</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Экран конкретного чата ===== -->
+  <div id="screen-chat" class="screen">
+    <div class="sidebar chat-wrapper" style="width: 320px;">
+      <div class="sidebar-header">
+        <button class="icon-btn" id="backToChats" style="display: none;">◀</button>
+        <div class="sidebar-brand" style="font-size: 18px;">Чат</div>
+        <div style="flex: 1;"></div>
+        <div class="sidebar-actions">
+          <button class="icon-btn" id="profileBtnChat">👤</button>
+          <button class="icon-btn" id="logoutBtnChat">🚪</button>
+        </div>
+      </div>
+      <div class="sidebar-body" id="conversationsListChat"></div>
+    </div>
+
+    <div class="chat-wrapper">
+      <div class="chat-header">
+        <div class="chat-left">
+          <div class="chat-info">
+            <div class="chat-title" id="chatTitle">Чат</div>
+            <div class="chat-subtitle" id="chatSubtitle">—</div>
+          </div>
+        </div>
+        <div id="chatHeaderAvatar"></div>
+        <div class="chat-right">
+          <button class="icon-btn">📎</button>
+          <button class="icon-btn">📞</button>
+          <button class="icon-btn">🎥</button>
+          <button class="icon-btn">ℹ️</button>
+        </div>
+      </div>
+
+      <div class="messages-container" id="messagesContainer">
+        <div class="empty-messages">
+          <div class="empty-icon">✨</div>
+          <div class="empty-title">Начните переписку</div>
+          <div class="empty-desc">Отправьте первое сообщение</div>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <div class="input-wrap">
+          <button class="icon-btn" style="background: transparent; border: none; padding: 0;">📎</button>
+          <textarea id="messageInput" placeholder="Новое сообщение…" rows="1"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" disabled>➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Скрипты ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    // ============================================
+    // Точка входа — инициализация Орбиты
+    // ============================================
+    (async () => {
+      const { createClient } = supabase;
+
+      // Проверка конфигурации
+      if (
+        !window.SUPABASE_CONFIG ||
+        window.SUPABASE_CONFIG.url.includes('ВАШ') ||
+        window.SUPABASE_CONFIG.anonKey.includes('ВАШ')
+      ) {
+        alert(
+          '⚠️ Настройте Supabase в файле js/config.js (Project URL и anon key), затем обновите страницу.'
+        );
+      }
+
+      const supabase = createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+      );
+
+      // Инициализация модулей
+      OrbitaAuth.init(supabase);
+      OrbitaChat.init(supabase);
+      OrbitaUI.init();
+
+      const currentView = () => OrbitaUI.getCurrentView();
+
+      /* ---------- АВТОРИЗАЦИЯ ---------- */
+
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const formLogin = document.getElementById('formLogin');
+      const formRegister = document.getElementById('formRegister');
+      const linkToLogin = document.getElementById('linkToLogin');
+
+      const showLogin = () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'flex';
+        formRegister.style.display = 'none';
+      };
+
+      const showRegister = () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formRegister.style.display = 'flex';
+        formLogin.style.display = 'none';
+      };
+
+      tabLogin.addEventListener('click', showLogin);
+      tabRegister.addEventListener('click', showRegister);
+      linkToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        showLogin();
+      });
+
+      formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+          await OrbitaAuth.signIn({ email, password });
+        } catch (err) {
+          OrbitaUI.showError(err.message || 'Ошибка входа');
+        }
+      });
+
+      formRegister.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        try {
+          await OrbitaAuth.signUp({ email, password, fullName: name });
+          OrbitaUI.showToast('Аккаунт создан! Войдите в систему.', 'success');
+          showLogin();
+        } catch (err) {
+          OrbitaUI.showError(err.message || 'Ошибка регистрации');
+        }
+      });
+
+      /* ---------- SUPABASE AUTH LISTENER ---------- */
+
+      const { data: authListener } = OrbitaAuth.onAuthStateChange(async (event, session) => {
+        if (session && session.user) {
+          // Обновляем статус
+          await OrbitaAuth.updateStatus('online');
+
+          // Переходим к чатам
+          OrbitaUI.navigateTo('chats');
+
+          // Загружаем чаты
+          await refreshConversations();
+
+          // Подписка на изменения списка чатов
+          OrbitaChat.subscribeToConversations(async () => {
+            await refreshConversations();
+          });
+        } else {
+          OrbitaUI.navigateTo('auth');
+        }
+      });
+
+      /* ---------- ВЫХОД ---------- */
+
+      const doLogout = async (btnId) => {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.addEventListener('click', async () => {
+          try {
+            await OrbitaAuth.signOut();
+          } catch (err) {
+            OrbitaUI.showError(err.message);
+          }
+        });
+      };
+
+      doLogout('logoutBtn');
+      doLogout('logoutBtnChat');
+
+      /* ---------- СПИСОК ЧАТОВ ---------- */
+
+      let currentConversationId = null;
+      let currentConversation = null;
+
+      const refreshConversations = async () => {
+        const convs = await OrbitaChat.loadConversations();
+        OrbitaUI.renderConversations(convs, async (conv) => {
+          currentConversation = conv;
+          currentConversationId = conv.id;
+          OrbitaChat.setCurrentConversation(conv.id);
+
+          // Заголовок чата
+          const me = OrbitaAuth.getCurrentUser();
+          const myProfile = await OrbitaAuth.getMyProfile();
+          OrbitaUI.setChatHeader(conv, myProfile);
+
+          // Загружаем сообщения
+          const messages = await OrbitaChat.loadMessages(conv.id);
+          OrbitaUI.renderMessages(messages, me.id);
+
+          // Отмечаем прочитанными
+          await OrbitaChat.markAsRead(conv.id);
+
+          // Переходим на экран чата
+          OrbitaUI.showChatScreen(conv);
+
+          // Подписка на новые сообщения
+          OrbitaChat.subscribeToMessages(conv.id, (newMsg) => {
+            OrbitaUI.appendMessage(newMsg, me.id);
+          });
+        });
+      };
+
+      document.getElementById('backToChats').addEventListener('click', () => {
+        OrbitaUI.navigateTo('chats');
+      });
+
+      /* ---------- НОВЫЙ ЧАТ / ПОИСК ---------- */
+
+      document.getElementById('newChatBtn').addEventListener('click', async () => {
+        const query = prompt('Введите имя пользователя (email или username):');
+        if (!query) return;
+        try {
+          const users = await OrbitaAuth.searchUsers(query);
+          if (!users || users.length === 0) {
+            OrbitaUI.showToast('Пользователь не найден');
+            return;
+          }
+          // Берём первого найденного (в продакшене — выбор из списка)
+          const companion = users[0];
+          const convId = await OrbitaChat.getOrCreateDirectConversation(companion.id);
+          await refreshConversations();
+        } catch (err) {
+          OrbitaUI.showError(err.message || 'Не удалось создать чат');
+        }
+      });
+
+      document.getElementById('searchUsers').addEventListener('input', async (e) => {
+        const q = e.target.value.trim();
+        if (!q) {
+          await refreshConversations();
+          return;
+        }
+        try {
+          const users = await OrbitaAuth.searchUsers(q);
+          // Рендерим список пользователей как чаты (упрощённо)
+          const fakeConvos = users.map((u) => ({
+            id: 'user:' + u.id,
+            type: 'direct',
+            name: u.full_name || u.username,
+            avatar: u.avatar_url,
+            lastMessage: 'Напишите первое сообщение',
+            lastMessageTime: new Date().toISOString(),
+            unread: false,
+            online: u.status === 'online',
+          }));
+          OrbitaUI.renderConversations(fakeConvos, async (conv) => {
+            const realId = conv.id.replace('user:', '');
+            const convId = await OrbitaChat.getOrCreateDirectConversation(realId);
+            currentConversationId = convId;
+            OrbitaChat.setCurrentConversation(convId);
+            const me = OrbitaAuth.getCurrentUser();
+            const messages = await OrbitaChat.loadMessages(convId);
+            OrbitaUI.renderMessages(messages, me.id);
+            OrbitaUI.showChatScreen({ name: conv.name, avatar: conv.avatar, online: conv.online });
+            OrbitaChat.subscribeToMessages(convId, (newMsg) => {
+              OrbitaUI.appendMessage(newMsg, me.id);
+            });
+          });
+        } catch (err) {
+          OrbitaUI.showError(err.message);
+        }
+      });
+
+      /* ---------- ОТПРАВКА СООБЩЕНИЯ ---------- */
+
+      const messageInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+
+      messageInput.addEventListener('input', () => {
+        const hasText = messageInput.value.trim().length > 0;
+        sendBtn.disabled = !hasText;
+        sendBtn.classList.toggle('active', hasText);
+
+        // Авторазмер textarea
+        messageInput.style.height = 'auto';
+        messageInput.style.height = messageInput.scrollHeight + 'px';
+      });
+
+      messageInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          await sendMessage();
+        }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+
+      const sendMessage = async () => {
+        const text = messageInput.value.trim();
+        if (!text || !currentConversationId) return;
+
+        try {
+          await OrbitaChat.sendMessage(currentConversationId, text);
+          messageInput.value = '';
+          messageInput.style.height = 'auto';
+          sendBtn.disabled = true;
+          sendBtn.classList.remove('active');
+        } catch (err) {
+          OrbitaUI.showError(err.message || 'Не удалось отправить сообщение');
+        }
+      };
+
+      /* ---------- СТАТУС ОНЛАЙН ---------- */
+
+      setInterval(async () => {
+        if (OrbitaAuth.getCurrentUser()) {
+          await OrbitaAuth.updateStatus('online');
+        }
+      }, 30000);
+
+      // При закрытии вкладки — офлайн
+      window.addEventListener('beforeunload', async () => {
+        if (OrbitaAuth.getCurrentUser()) {
+          await OrbitaAuth.updateStatus('offline');
+        }
+      });
+
+      document.addEventListener('visibilitychange', async () => {
+        if (document.hidden) {
+          await OrbitaAuth.updateStatus('offline');
+        } else if (OrbitaAuth.getCurrentUser()) {
+          await OrbitaAuth.updateStatus('online');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
